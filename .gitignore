@@ -1,0 +1,5 @@
+# Este repo (rama main) SOLO contiene README + manifiesto de actualización.
+# Los binarios se publican como ASSETS de cada Release, nunca como archivos del repo.
+*.exe
+*.zip
+*.cer
