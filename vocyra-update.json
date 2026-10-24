@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.3",
+    "version":  "0.1.4",
     "date":  "2026-10-24",
-    "notes":  "Novedad: activación con código personal (pídelo a quien te pasó Vocyra; se liga a tu PC). Si actualizas, te lo pedirá una vez. Tus sonidos y ajustes no cambian.",
+    "notes":  "Ya no hay códigos de activación: Vocyra funciona directo. Si tenías la 0.1.3, esta versión la reemplaza.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
