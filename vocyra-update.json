@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.0",
+    "version":  "0.1.1",
     "date":  "2026-10-23",
-    "notes":  "Primera versión pública: sonidos ilimitados con recorte y volumen, categorías, atajos globales, aleatorio, grabar lo que suena en el PC, repetición instantánea, agregar videos, compartir packs (archivo o enlace con Google Drive) y actualizaciones automáticas.",
+    "notes":  "Tono y velocidad por sonido (grave/agudo), repetir en bucle, sonidos que suenan solo mientras mantienes el atajo, pausar/reanudar todo, y opción para bajar tu voz mientras suena un sonido.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
