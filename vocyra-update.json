@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.1",
+    "version":  "0.1.2",
     "date":  "2026-10-23",
-    "notes":  "Tono y velocidad por sonido (grave/agudo), repetir en bucle, sonidos que suenan solo mientras mantienes el atajo, pausar/reanudar todo, y opción para bajar tu voz mientras suena un sonido.",
+    "notes":  "Novedades: texto a voz, grabar tu voz, repetición con tu micrófono, color e ícono por sonido, perfiles por juego, control desde el celular (QR en Ajustes), efectos de voz en vivo (página Voces) y quitar ruido de fondo. Arreglo: los atajos de cada sonido volvieron a funcionar.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
