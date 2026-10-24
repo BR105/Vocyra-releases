@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pack de Vocyra</title>
+<link rel="icon" href="vocyra.png">
+<style>
+  :root { --bg:#0E0F12; --sup:#17191F; --borde:#2A2D37; --txt:#F2F3F5; --tenue:#AEB3BF; --acento:#FF8A3D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:"Segoe UI",system-ui,sans-serif; line-height:1.6; }
+  main { max-width:620px; margin:0 auto; padding:56px 16px; }
+  .logo { display:flex; align-items:center; gap:12px; }
+  .logo img { width:48px; height:48px; border-radius:12px; }
+  h1 { font-size:30px; margin:0; }
+  p, li { color:var(--tenue); }
+  .caja { margin:20px 0; padding:16px; border-radius:12px; background:var(--sup); border:1px solid var(--borde); }
+  code { display:block; word-break:break-all; color:var(--txt); font-size:14px; margin:8px 0 12px; }
+  button, .btn { display:inline-block; padding:10px 18px; border-radius:10px; border:0; background:var(--acento); color:#1A0E05; font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; }
+  .sec { background:transparent; color:var(--txt); border:1px solid var(--borde); }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo"><img src="vocyra.png" alt=""><h1>Te compartieron sonidos</h1></div>
+  <p>Este enlace contiene un pack de sonidos para <strong>Vocyra</strong>, el soundboard gratuito para Discord y juegos.</p>
+  <div class="caja">
+    <ol>
+      <li>Abre Vocyra → <strong>Compartir</strong> → <strong>Recibir</strong>.</li>
+      <li>Pega este enlace y pulsa <strong>Recibir</strong>.</li>
+    </ol>
+    <code id="enlace"></code>
+    <button id="copiar">Copiar enlace</button>
+  </div>
+  <p>¿No tienes Vocyra? <a class="btn sec" href="https://github.com/BR105/Vocyra-releases/releases/latest">Descargar Vocyra</a></p>
+</main>
+<script>
+  const e = document.getElementById('enlace');
+  e.textContent = location.href;
+  document.getElementById('copiar').onclick = async () => {
+    try { await navigator.clipboard.writeText(location.href); document.getElementById('copiar').textContent = '¡Copiado!'; } catch (_) {}
+  };
+</script>
+</body>
+</html>
