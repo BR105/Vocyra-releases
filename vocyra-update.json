@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.4",
+    "version":  "0.1.5",
     "date":  "2026-10-24",
-    "notes":  "Ya no hay códigos de activación: Vocyra funciona directo. Si tenías la 0.1.3, esta versión la reemplaza.",
+    "notes":  "Arreglo: Vocyra ya no se cierra al agregar audios m4a/mp4 guardados como .mp3 (ahora los convierte solo). Novedades: atajo por cada voz y modo mantener presionado, compuerta de ruido, volumen aparte para tus audífonos, respaldo de tu biblioteca en Google Drive (manual y diario), atajo Decir lo copiado, accesos rápidos en la barra de abajo y un solo botón Agregar.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
