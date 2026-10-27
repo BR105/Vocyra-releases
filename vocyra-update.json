@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.5",
-    "date":  "2026-10-24",
-    "notes":  "Arreglo: Vocyra ya no se cierra al agregar audios m4a/mp4 guardados como .mp3 (ahora los convierte solo). Novedades: atajo por cada voz y modo mantener presionado, compuerta de ruido, volumen aparte para tus audífonos, respaldo de tu biblioteca en Google Drive (manual y diario), atajo Decir lo copiado, accesos rápidos en la barra de abajo y un solo botón Agregar.",
+    "version":  "0.1.6",
+    "date":  "2026-10-26",
+    "notes":  "Novedades: pistas por app en la repetición y en Grabar PC (elige qué apps conservar con su ícono en el menú ⋯ › Pistas), botón directo para guardar el clip y tiempo personalizado (5 s a 10 min), atajos con los botones laterales del ratón, voz personalizada con tono ajustable, quitar sonidos repetidos, guía de primera vez y barra que se acomoda en ventanas angostas. Arreglos: repara solo los audios que no se podían tocar y gasta mucho menos CPU en reposo.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
