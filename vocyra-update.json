@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.7",
+    "version":  "0.1.8",
     "date":  "2026-10-28",
-    "notes":  "Arreglo: en algunas PC (sobre todo laptops) Vocyra se quedaba sin audio porque Windows rechazaba el formato del micrófono. Ahora prueba otros formatos y, si un dispositivo falla, lo demás sigue funcionando y te dice cuál fue.",
+    "notes":  "Arreglos para laptops: el micrófono se abre con un segundo método de Windows si el normal falla (y deja vocyra-audio.log si algo sale mal), las conexiones usan los certificados de Windows (arregla actualizar con algunos antivirus) y Vocyra detecta solo cuando conectas o quitas unos audífonos o un micrófono.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
