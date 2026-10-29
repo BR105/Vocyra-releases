@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.9",
+    "version":  "0.1.10",
     "date":  "2026-10-28",
-    "notes":  "Micrófono en laptops: si Windows rechaza abrirlo, Vocyra prueba 4 maneras más (con y sin evento, con el formato propio o el del dispositivo) y vocyra-audio.log dice en qué paso exacto falla.",
+    "notes":  "Micrófono en laptops: si Windows rechaza todo lo normal, Vocyra lo abre en modo RAW (sin los efectos de audio del fabricante) o en modo comunicaciones, como Discord y Teams.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
