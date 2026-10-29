@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.10",
+    "version":  "0.1.11",
     "date":  "2026-10-28",
-    "notes":  "Micrófono en laptops: si Windows rechaza todo lo normal, Vocyra lo abre en modo RAW (sin los efectos de audio del fabricante) o en modo comunicaciones, como Discord y Teams.",
+    "notes":  "Lo que suena se pausa al abrir Editar sonido. La repetición puede guardar tu voz con los efectos puestos (monstruo, robot…) o la original. Y al guardar el clip con el atajo desde un juego sale un aviso en la esquina de la pantalla, como en Medal.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
