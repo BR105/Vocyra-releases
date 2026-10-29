@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.8",
+    "version":  "0.1.9",
     "date":  "2026-10-28",
-    "notes":  "Arreglos para laptops: el micrófono se abre con un segundo método de Windows si el normal falla (y deja vocyra-audio.log si algo sale mal), las conexiones usan los certificados de Windows (arregla actualizar con algunos antivirus) y Vocyra detecta solo cuando conectas o quitas unos audífonos o un micrófono.",
+    "notes":  "Micrófono en laptops: si Windows rechaza abrirlo, Vocyra prueba 4 maneras más (con y sin evento, con el formato propio o el del dispositivo) y vocyra-audio.log dice en qué paso exacto falla.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
