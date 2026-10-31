@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.11",
-    "date":  "2026-10-28",
-    "notes":  "Lo que suena se pausa al abrir Editar sonido. La repetición puede guardar tu voz con los efectos puestos (monstruo, robot…) o la original. Y al guardar el clip con el atajo desde un juego sale un aviso en la esquina de la pantalla, como en Medal.",
+    "version":  "0.1.12",
+    "date":  "2026-10-30",
+    "notes":  "Ajustes › Audio ahora explica cómo configurar Discord: un diagrama de por dónde pasa tu voz, cómo deben quedar la entrada y la salida en Discord, y qué va en cada campo.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
