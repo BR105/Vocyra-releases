@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.12",
+    "version":  "0.1.13",
     "date":  "2026-10-30",
-    "notes":  "Ajustes › Audio ahora explica cómo configurar Discord: un diagrama de por dónde pasa tu voz, cómo deben quedar la entrada y la salida en Discord, y qué va en cada campo.",
+    "notes":  "Voz IA (experimental): cambia tu voz en vivo por la de un modelo entrenado, con el complemento VocyraIA. Lo que borras se quita también de Drive y de tus otras PCs. Vocyra busca actualizaciones cada 3 horas y avisa en la esquina. Menús rápidos que ya no se cortan, respaldo oculto sin sesión de Google, página de Google renovada y aviso si un antivirus bloquea el micrófono.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
