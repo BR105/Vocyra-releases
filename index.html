@@ -1,41 +1,839 @@
-<!doctype html>
-<html lang="es">
+﻿<!DOCTYPE html>
+<html lang="es" class="no-js">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vocyra</title>
-<link rel="icon" href="vocyra.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocyra — Soundboard y cambiador de voz para Windows</title>
+<meta name="description" content="Vocyra es un soundboard y cambiador de voz gratuito y portable para Windows: sonidos ilimitados en Discord, juegos y llamadas, con atajos que funcionan dentro del juego.">
+<link rel="icon" type="image/png" href="vocyra.png">
+<meta name="theme-color" content="#0a0a0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Vocyra">
+<meta property="og:title" content="Vocyra — Soundboard y cambiador de voz para Windows">
+<meta property="og:description" content="Sonidos ilimitados en Discord, juegos y llamadas, con atajos que funcionan dentro del juego. Gratis y portable.">
 <style>
-  :root { --bg:#0E0F12; --sup:#17191F; --txt:#F2F3F5; --tenue:#AEB3BF; --acento:#FF8A3D; }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--txt); font-family:"Segoe UI",system-ui,sans-serif; line-height:1.6; }
-  main { max-width:760px; margin:0 auto; padding:64px 16px; }
-  .logo { display:flex; align-items:center; gap:14px; }
-  .logo img { width:56px; height:56px; border-radius:14px; }
-  h1 { font-size:40px; margin:0; letter-spacing:-0.02em; }
-  p { color:var(--tenue); font-size:17px; }
-  .btn { display:inline-block; margin-top:16px; padding:12px 22px; border-radius:10px; background:var(--acento); color:#1A0E05; font-weight:700; text-decoration:none; }
-  ul { color:var(--tenue); font-size:16px; }
-  footer { margin-top:56px; padding-top:20px; border-top:1px solid #23262F; font-size:14px; color:var(--tenue); }
-  footer a { color:var(--tenue); margin-right:16px; }
+:root{
+  /* Misma estructura de tokens que Zynora; los valores son los de Vocyra (src/estilo.rs) */
+  --bg:#0a0a0c; --bg-2:#0e0f12; --surface:#141419; --surface-2:#1a1a21; --surface-hover:#20202a;
+  --hairline:rgba(255,255,255,.08); --hairline-2:rgba(255,255,255,.05);
+  /* --text-muted sube a 4.5:1 sobre el fondo; en Zynora se quedó en #67677a (3.5:1) */
+  --text:#ececf1; --text-dim:#9c9ca8; --text-muted:#8b8b9c;
+  --accent:#ff8a3d; --accent-soft:rgba(255,138,61,.14); --accent-line:rgba(255,138,61,.35);
+  --cyan:#4dd4ff; --cyan-soft:rgba(77,212,255,.12);
+  --ok:#3ddc97; --warn:#ffc94d; --danger:#ff6b5b;
+  --c-blue:#5b8cff; --c-pink:#f25f8b; --c-violet:#9b7bff;
+  --glass:rgba(255,255,255,.07); --glass-2:rgba(255,255,255,.12);
+  --glass-brd:rgba(255,255,255,.20); --glass-hi:inset 0 1px 0 rgba(255,255,255,.18);
+  --glass-sh:0 16px 44px -22px rgba(0,0,0,.55); --glass-blur:blur(18px) saturate(1.3);
+  --r-card:14px; --r-ctrl:9px;
+  --maxw:1140px;
+  --font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-color:var(--surface-2) var(--bg-2);scrollbar-width:thin}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--font);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:rgba(255,138,61,.38);color:#fff}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--bg-2)}
+::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:8px;border:2px solid var(--bg-2)}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,138,61,.45)}
+/* Rejilla tech ambiente, igual que en Zynora */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,138,61,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,138,61,.04) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(115% 70% at 50% -8%,#000,transparent 72%);
+  mask-image:radial-gradient(115% 70% at 50% -8%,#000,transparent 72%);
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+p{margin:0}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.eyebrow{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:16px;
+}
+.eyebrow.cyan{color:var(--cyan)}
+
+/* ---- Marca ---- */
+.lockup{display:inline-flex;align-items:center;gap:.42em;line-height:1}
+.lockup img{height:1.1em;width:auto;flex:none;border-radius:6px}
+.lockup .word{font-weight:800;letter-spacing:-.045em;color:var(--text);font-size:1em}
+.lockup .word .v{color:var(--accent)}
+
+/* ---- Botones ---- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;font-family:var(--font);font-size:15px;font-weight:600;
+  padding:13px 22px;border-radius:var(--r-ctrl);border:1px solid transparent;cursor:pointer;
+  transition:transform .2s var(--ease),background .2s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease;
+}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--accent);color:#1a0e05;box-shadow:0 8px 30px -8px rgba(255,138,61,.6)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px -10px rgba(255,138,61,.75);color:#2a1607}
+.btn-ghost{background:var(--glass);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);border-color:var(--glass-brd);color:var(--text);box-shadow:var(--glass-hi)}
+.btn-ghost:hover{background:rgba(255,255,255,.13);border-color:var(--accent-line);transform:translateY(-2px);box-shadow:var(--glass-hi),0 0 26px -8px rgba(255,138,61,.5)}
+a:focus-visible,button:focus-visible,.btn:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:8px;
+}
+
+/* ---- Header ---- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(10,10,12,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hairline-2);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.brand .lockup{font-size:22px}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{color:var(--text-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:not(.btn){position:relative}
+.nav-links a:not(.btn)::after{
+  content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1.5px;border-radius:2px;
+  background:linear-gradient(90deg,var(--accent),var(--cyan));transition:right .28s var(--ease);
+}
+.nav-links a:not(.btn):hover::after{right:0}
+.nav .btn{padding:9px 18px;font-size:14px}
+/* el botón del navbar no hereda el gris de los enlaces */
+.nav-links a.btn-primary{color:#1a0e05}
+.nav-links a.btn-primary:hover{color:#2a1607}
+@media (max-width:860px){ .nav-links a:not(.btn){display:none} }
+
+/* ---- Hero ---- */
+.hero{position:relative;padding:92px 0 62px;text-align:center;overflow:hidden}
+.hero-glow{
+  position:absolute;top:-160px;left:50%;transform:translateX(-50%);
+  width:900px;height:600px;pointer-events:none;z-index:0;max-width:100%;
+  background:radial-gradient(closest-side,rgba(255,138,61,.26),rgba(255,138,61,.05) 55%,transparent 72%);
+  filter:blur(20px);animation:breathe 9s ease-in-out infinite;
+}
+.hero-glow.cy{
+  top:40px;width:720px;height:420px;
+  background:radial-gradient(closest-side,rgba(77,212,255,.14),transparent 70%);
+  animation-delay:-4s;
+}
+@keyframes breathe{0%,100%{opacity:.75;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+.hero .wrap{position:relative;z-index:1}
+.hero-brand{display:flex;flex-direction:column;align-items:center;gap:18px;margin:0 auto 30px}
+.hero-wordmark{
+  font-size:clamp(52px,10vw,92px);font-weight:800;letter-spacing:-.05em;line-height:1;
+  filter:drop-shadow(0 2px 10px rgba(255,138,61,.45));
+}
+.hero-wordmark .v{color:var(--accent)}
+.hero h1{font-size:clamp(32px,5.4vw,56px);letter-spacing:-.03em;max-width:17ch;margin:0 auto 20px}
+.hero h1 .grad{
+  background:linear-gradient(100deg,#ffd4ad,#ff8a3d 58%,#ff6b5b);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--text-dim);max-width:56ch;margin:0 auto 36px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:34px}
+.badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.badge{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text-dim);
+  background:var(--glass);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);
+  border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);padding:7px 14px;border-radius:100px;
+  transition:border-color .2s,color .2s;
+}
+.badge:hover{border-color:var(--accent-line);color:var(--text)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+
+/* ---- Franja ---- */
+.strip{border-top:1px solid var(--hairline-2);border-bottom:1px solid var(--hairline-2);padding:26px 0;background:var(--bg-2);position:relative;z-index:1}
+.strip .wrap{display:flex;align-items:center;justify-content:center;gap:10px 12px;flex-wrap:wrap;text-align:center}
+.strip .lead{color:var(--text);font-weight:700;font-size:14px;margin-right:2px}
+.strip span:not(.lead){
+  color:var(--text-dim);font-size:13px;font-weight:600;
+  background:var(--glass);-webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:blur(8px) saturate(1.2);
+  border:1px solid var(--glass-brd);border-radius:100px;padding:6px 14px;
+  transition:border-color .2s,color .2s;
+}
+.strip span:not(.lead):hover{border-color:var(--accent-line);color:var(--text)}
+
+/* ---- Secciones ---- */
+section{position:relative;z-index:1}
+.section{padding:84px 0}
+.section-head{max-width:660px;margin:0 auto 54px;text-align:center}
+.section-head h2{font-size:clamp(28px,4vw,42px);margin-bottom:14px}
+.section-head p{color:var(--text-dim);font-size:17px}
+.has-glow::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(700px 400px at 15% 20%,rgba(255,138,61,.10),transparent 60%),
+             radial-gradient(700px 400px at 85% 80%,rgba(77,212,255,.07),transparent 60%);
+}
+
+/* ---- Showcase alterno ---- */
+.showcase{display:flex;align-items:center;padding:72px 0;overflow:hidden}
+.showcase .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;width:100%}
+.showcase.rev .illus{order:2}
+/* Las etiquetas viven en el hueco de arriba y abajo, nunca encima del panel. */
+.showcase .illus{position:relative;perspective:1200px;padding:32px 0}
+.showcase .illus .panel{transition:transform .5s var(--ease)}
+.showcase:hover .illus .panel{transform:translateY(-6px) scale(1.012) rotateX(1.5deg) rotateY(-2.5deg)}
+.showcase.rev:hover .illus .panel{transform:translateY(-6px) scale(1.012) rotateX(1.5deg) rotateY(2.5deg)}
+.showcase .copy .step{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.showcase .copy .step.cy{color:var(--cyan)}
+.showcase .copy h2{font-size:clamp(30px,4.4vw,46px);margin-bottom:18px;max-width:15ch}
+.showcase .copy p{color:var(--text-dim);font-size:clamp(16px,2vw,19px);max-width:44ch}
+.showcase .copy .sub{color:var(--text-muted);font-size:15px;margin-top:16px;max-width:44ch}
+
+/* entradas laterales */
+.slide-l,.slide-r,.reveal{opacity:0;transition:opacity .8s ease,transform .8s var(--ease)}
+.slide-l{transform:translateX(-70px)}
+.slide-r{transform:translateX(70px)}
+.reveal{transform:translateY(26px)}
+.slide-l.in,.slide-r.in,.reveal.in{opacity:1;transform:none}
+html.no-js .slide-l,html.no-js .slide-r,html.no-js .reveal{opacity:1;transform:none}
+
+/* ---- Etiquetas flotantes sobre los paneles ---- */
+.pin{
+  position:absolute;z-index:3;display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;color:var(--text);line-height:1.2;
+  background:rgba(18,18,23,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  border:1px solid var(--hairline);border-radius:100px;padding:6px 12px;white-space:nowrap;
+  box-shadow:0 10px 26px -12px rgba(0,0,0,.75);
+  opacity:0;transform:translateY(8px) scale(.96);
+  transition:opacity .55s ease,transform .55s var(--ease);
+}
+.pin::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.pin.cy::before{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.illus.in .pin{opacity:1;transform:none}
+.illus.in .pin:nth-of-type(2){transition-delay:.12s}
+.illus.in .pin:nth-of-type(3){transition-delay:.24s}
+html.no-js .pin{opacity:1;transform:none}
+
+/* ---- Panel de app (vidrio con glow, hace de "imagen") ---- */
+.panel{
+  position:relative;border-radius:var(--r-card);overflow:hidden;
+  background:linear-gradient(180deg,rgba(26,26,33,.96),rgba(16,16,21,.96));
+  border:1px solid var(--glass-brd);
+  box-shadow:0 0 60px -12px rgba(255,138,61,.26),0 24px 60px -20px rgba(0,0,0,.75),var(--glass-hi);
+}
+.panel.cy{box-shadow:0 0 60px -12px rgba(77,212,255,.26),0 24px 60px -20px rgba(0,0,0,.75),var(--glass-hi)}
+.p-bar{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--hairline-2);background:rgba(255,255,255,.03)}
+.p-bar b{font-size:13.5px;font-weight:700}
+.p-bar span{font-size:12.5px;color:var(--text-muted)}
+.p-tabs{display:flex;gap:4px;margin-left:auto}
+.p-tab{font-size:12px;color:var(--text-muted);padding:5px 10px;border-radius:100px}
+.p-tab[aria-current]{background:var(--accent-soft);color:var(--accent)}
+.p-body{padding:16px}
+.p-row{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13.5px;border-bottom:1px solid var(--hairline-2)}
+.p-row:last-child{border-bottom:0}
+.p-row .k{
+  font-size:11.5px;font-weight:600;color:var(--text-dim);background:rgba(255,255,255,.06);
+  border:1px solid var(--hairline);border-radius:100px;padding:3px 10px;white-space:nowrap;
+}
+.p-row .r{margin-left:auto;color:var(--text-muted);font-size:12.5px}
+.p-label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:7px}
+.p-sel{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px;
+  background:rgba(255,255,255,.05);border:1px solid var(--hairline);border-radius:var(--r-ctrl);padding:11px 14px;
+}
+.p-sel::after{content:"";width:7px;height:7px;border-right:2px solid var(--text-muted);border-bottom:2px solid var(--text-muted);transform:rotate(45deg) translateY(-2px)}
+/* Zona del QR: centrada en los dos ejes dentro del panel */
+.qr-zone{display:grid;place-items:center;gap:14px;padding:30px 20px 34px}
+.qr{display:block;width:152px;padding:10px;background:#fff;border-radius:12px;box-shadow:0 10px 30px -14px rgba(0,0,0,.8)}
+.qr svg{width:100%;height:auto;display:block}
+.qr-nota{font-size:11.5px;color:var(--text-muted);text-align:center;max-width:30ch}
+.meter{display:flex;gap:3px;align-items:flex-end;height:22px}
+.meter i{width:4px;border-radius:2px;display:block;background:var(--ok)}
+
+/* rejilla de sonidos (lo vivo de la página) */
+/* 213px = exactamente 3 filas (65px + 9 de hueco): nunca se ve media ficha cortada */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-height:213px;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;scrollbar-width:thin}
+.sound{
+  display:flex;flex-direction:column;gap:7px;align-items:flex-start;
+  background:rgba(255,255,255,.045);border:1px solid var(--hairline);border-radius:11px;
+  padding:11px 12px;cursor:pointer;font:inherit;color:var(--text);text-align:left;
+  transition:background .16s,border-color .16s,transform .16s var(--ease);
+}
+.sound:hover{background:rgba(255,255,255,.08);border-color:var(--accent-line);transform:translateY(-2px)}
+.sound b{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px;line-height:1.25}
+.sound b::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pt,var(--accent));box-shadow:0 0 7px var(--pt,var(--accent));flex:none}
+.sound span{font-size:11.5px;color:var(--text-muted)}
+.sound.on{background:var(--accent);border-color:var(--accent);color:#1a0e05}
+.sound.on span{color:#1a0e05}
+.sound.on b::before{background:#1a0e05;box-shadow:none}
+.addrow{display:flex;gap:8px;margin-top:12px}
+.addrow input{
+  flex:1;min-width:0;font:inherit;font-size:13px;color:var(--text);
+  background:rgba(255,255,255,.05);border:1px solid var(--hairline);border-radius:100px;padding:10px 16px;
+}
+.addrow input::placeholder{color:var(--text-muted)}
+.addrow button{
+  border:0;border-radius:100px;background:var(--accent);color:#1a0e05;cursor:pointer;
+  font:600 13px/1 var(--font);padding:0 18px;
+}
+.cap{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:12px;color:var(--text-muted)}
+.cap b{color:var(--accent);font-weight:700}
+
+/* ---- Cadena de 4 pasos ---- */
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.step-card{
+  position:relative;background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-brd);border-radius:var(--r-card);padding:22px;box-shadow:var(--glass-hi),var(--glass-sh);
+}
+.step-card .n{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin-bottom:14px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);
+}
+.step-card .n svg{width:17px;height:17px}
+.step-card h3{font-size:16px;margin-bottom:8px}
+.step-card p{font-size:14px;color:var(--text-dim)}
+
+/* ---- Tarjetas de funciones ---- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{
+  background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-brd);border-radius:var(--r-card);padding:24px;
+  box-shadow:var(--glass-hi),var(--glass-sh);
+  transition:transform .25s var(--ease),border-color .25s;
+}
+.card:hover{transform:translateY(-4px);border-color:var(--accent-line)}
+.card .ico{
+  width:38px;height:38px;border-radius:10px;display:grid;place-items:center;margin-bottom:16px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);
+}
+.card .ico svg{width:19px;height:19px}
+.card.cy .ico{background:var(--cyan-soft);border-color:rgba(77,212,255,.35);color:var(--cyan)}
+.card h3{font-size:17px;margin-bottom:9px}
+.card p{font-size:14.5px;color:var(--text-dim)}
+
+/* ---- Preguntas ---- */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:10px}
+.faq details{
+  background:var(--glass);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);
+  border:1px solid var(--glass-brd);border-radius:var(--r-card);box-shadow:var(--glass-hi);overflow:hidden;
+}
+.faq summary{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;list-style:none;cursor:pointer;
+  padding:18px 22px;font-size:16px;font-weight:600;
+}
+.faq summary::-webkit-details-marker{display:none}
+/* Flechita tipo Bootstrap: apunta abajo cerrada, arriba abierta */
+.faq .pm{position:relative;width:16px;height:16px;flex:none;color:var(--accent);transition:transform .22s var(--ease)}
+.faq .pm::before{
+  content:"";position:absolute;left:3px;top:2px;width:9px;height:9px;border-radius:1px;
+  border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);
+}
+.faq details[open]{border-color:var(--accent-line)}
+.faq details[open] .pm{transform:rotate(180deg)}
+.faq details p{padding:0 22px 20px;color:var(--text-dim);font-size:15px;max-width:62ch}
+
+/* ---- CTA ---- */
+.cta{padding:96px 0;text-align:center;position:relative;overflow:hidden}
+.cta::before{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:1000px;height:520px;max-width:120%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,138,61,.20),transparent 72%);filter:blur(18px);
+}
+.cta .wrap{position:relative;z-index:1}
+.cta h2{font-size:clamp(30px,5vw,50px);max-width:18ch;margin:0 auto 18px}
+.cta p{color:var(--text-dim);font-size:17px;max-width:52ch;margin:0 auto 32px}
+
+/* ---- Pie ---- */
+footer{border-top:1px solid var(--hairline-2);background:var(--bg-2);padding:52px 0 36px;position:relative;z-index:1}
+/* Mismo formato de pie que la página de Zynora */
+.foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-brand{max-width:320px}
+.foot-brand .lockup{font-size:20px;margin-bottom:14px}
+.foot-brand p{color:var(--text-muted);font-size:13.5px;line-height:1.6}
+.foot-credit{
+  display:inline-flex;align-items:center;gap:7px;margin-top:16px;
+  color:var(--text-dim);font-size:13px;font-weight:600;
+  padding:4px 12px 4px 4px;border-radius:100px;border:1px solid transparent;background:transparent;
+  transition:color .2s,background .2s,border-color .2s;
+}
+.foot-credit:hover{
+  color:var(--text);background:var(--glass);border-color:var(--glass-brd);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.foot-credit img{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--hairline);object-fit:cover}
+.foot-made{margin-top:12px;color:var(--text-muted);font-size:12px;line-height:1.5}
+.foot-made b{color:var(--text-dim);font-weight:600}
+.foot-cols{display:flex;gap:64px;flex-wrap:wrap}
+.foot-col h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin:0 0 14px}
+.foot-col a{display:block;color:var(--text-dim);font-size:14.5px;margin-bottom:10px;transition:color .2s}
+.foot-col a:hover{color:var(--text)}
+.kofi{color:var(--accent) !important;font-weight:600}
+/* Las otras apps de la casa, en tarjeta */
+.card.app{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none}
+.app-ico{width:52px;height:52px;object-fit:contain;margin-bottom:18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6))}
+.card.app h3{font-size:19px;margin-bottom:10px}
+.card.app p{flex:1}
+.app-cta{
+  display:inline-flex;align-items:center;gap:8px;margin-top:20px;
+  font-size:14px;font-weight:600;color:var(--accent);
+}
+.app-cta svg{width:16px;height:16px;transition:transform .2s var(--ease)}
+.card.app:hover .app-cta svg{transform:translateX(4px)}
+.app-cta.pronto{
+  color:var(--text-muted);font-weight:500;
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:100px;padding:5px 14px;font-size:12.5px;
+}
+.foot-bottom{margin-top:40px;padding-top:22px;border-top:1px solid var(--hairline-2);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--text-muted);font-size:13px}
+
+@media (max-width:980px){
+  .showcase .wrap{grid-template-columns:1fr;gap:36px}
+  .showcase.rev .illus{order:0}
+  .chain{grid-template-columns:1fr 1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .foot{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .hero{padding:68px 0 60px}
+  .section{padding:62px 0}
+  .showcase{padding:52px 0}
+  .chain,.cards{grid-template-columns:1fr}
+  .sgrid{grid-template-columns:1fr 1fr;max-height:213px}
+  .foot{grid-template-columns:1fr;gap:30px}
+  /* en el teléfono las etiquetas caerían encima del panel: se ocultan, el texto ya lo dice */
+  .pin{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  .slide-l,.slide-r,.reveal,.pin{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
-<main>
-  <div class="logo"><img src="vocyra.png" alt=""><h1>Vocyra</h1></div>
-  <p>Soundboard gratuito para Windows: reproduce tus sonidos en Discord, juegos y llamadas, con atajos de teclado que funcionan dentro del juego.</p>
-  <ul>
-    <li>Sonidos ilimitados, con recorte, volumen y favoritos.</li>
-    <li>Agrega audio, extrae el sonido de videos o graba lo que suena en tu PC.</li>
-    <li>Repetición instantánea: guarda con un atajo lo último que sonó.</li>
-    <li>Respaldo y sincronización opcionales con tu propio Google Drive.</li>
-  </ul>
-  <a class="btn" href="https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip">Descargar</a>
-  <footer>
-    <a href="privacidad.html">Política de privacidad</a>
-    <a href="terminos.html">Condiciones del servicio</a>
-    <span>Contacto: vocyra.app@gmail.com</span>
-  </footer>
-</main>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Vocyra inicio">
+      <span class="lockup"><img src="vocyra.png" alt=""><span class="word"><span class="v">V</span>ocyra</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#sonidos">Sonidos</a>
+      <a href="#voz">Voz</a>
+      <a href="#como">Cómo funciona</a>
+      <a class="btn btn-primary" href="https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip">Descargar gratis</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="hero-glow cy" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero-brand">
+      <div class="hero-wordmark"><span class="v">V</span>ocyra</div>
+    </div>
+    <h1>Suena lo que quieras en <span class="grad">Discord</span></h1>
+    <p class="hero-sub">Soundboard y cambiador de voz para Windows, también en juegos y llamadas. Tus sonidos y tu voz salen juntos por un solo micrófono, con atajos que siguen funcionando dentro del juego.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg>
+        Descargar gratis
+      </a>
+      <a class="btn btn-ghost" href="#como">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Cómo funciona
+      </a>
+    </div>
+    <div class="badges">
+      <span class="badge"><span class="dot"></span>Windows 10 / 11 (64-bit)</span>
+      <span class="badge">Portable · sin instalación</span>
+      <span class="badge">100% gratis</span>
+      <span class="badge">Sin anuncios</span>
+    </div>
+  </div>
+</section>
+
+<!-- FRANJA -->
+<div class="strip reveal">
+  <div class="wrap">
+    <span class="lead">Funciona donde ya hablas:</span>
+    <span>Discord</span><span>Juegos con chat de voz</span><span>Zoom, Teams y Meet</span><span>Grabaciones</span>
+  </div>
+</div>
+
+<!-- SHOWCASE 1 · SONIDOS -->
+<section class="showcase" id="sonidos">
+  <div class="wrap">
+    <div class="illus slide-l">
+      <div class="panel" data-ui>
+        <div class="p-bar">
+          <b>Sonidos</b><span id="cuenta">24 sonidos</span>
+          <div class="p-tabs"><span class="p-tab" aria-current="true">Sonidos</span><span class="p-tab">Voces</span><span class="p-tab">Ajustes</span></div>
+        </div>
+        <div class="p-body">
+          <div class="cap"><span>Hasta aquí llega el soundboard de Discord</span><b id="cabe">y aquí van 24</b></div>
+          <div class="sgrid" id="rejilla">
+            <button class="sound" style="--pt:#ff8a3d"><b>Risa</b><span>F1</span></button>
+            <button class="sound" style="--pt:#5b8cff"><b>Tambores</b><span>F2</span></button>
+            <button class="sound" style="--pt:#3ddc97"><b>Grillos</b><span>F3</span></button>
+            <button class="sound" style="--pt:#f25f8b"><b>Aplausos</b><span>F4</span></button>
+            <button class="sound" style="--pt:#ffc94d"><b>Error XP</b><span>F5</span></button>
+            <button class="sound" style="--pt:#9b7bff"><b>Silbato</b><span>F6</span></button>
+            <button class="sound" style="--pt:#4dd4ff"><b>Trompeta</b><span>F7</span></button>
+            <button class="sound" style="--pt:#ff6b5b"><b>Pato</b><span>F8</span></button>
+            <button class="sound" style="--pt:#ff8a3d"><b>Explosión</b><span>Ctrl+1</span></button>
+            <button class="sound" style="--pt:#5b8cff"><b>Monedas</b><span>Ctrl+2</span></button>
+            <button class="sound" style="--pt:#3ddc97"><b>Puerta</b><span>Ctrl+3</span></button>
+            <button class="sound" style="--pt:#f25f8b"><b>Suspenso</b><span>Ctrl+4</span></button>
+            <button class="sound" style="--pt:#ffc94d"><b>Gol</b><span>Ctrl+5</span></button>
+            <button class="sound" style="--pt:#9b7bff"><b>Cristal</b><span>Ctrl+6</span></button>
+            <button class="sound" style="--pt:#4dd4ff"><b>Alarma</b><span>Ctrl+7</span></button>
+            <button class="sound" style="--pt:#ff6b5b"><b>Campana</b><span>Ctrl+8</span></button>
+            <button class="sound" style="--pt:#ff8a3d"><b>Moto</b><span>Alt+1</span></button>
+            <button class="sound" style="--pt:#5b8cff"><b>Reloj</b><span>Alt+2</span></button>
+            <button class="sound" style="--pt:#3ddc97"><b>Fuegos</b><span>Alt+3</span></button>
+            <button class="sound" style="--pt:#f25f8b"><b>Tos</b><span>Alt+4</span></button>
+            <button class="sound" style="--pt:#ffc94d"><b>Caja</b><span>Alt+5</span></button>
+            <button class="sound" style="--pt:#9b7bff"><b>Bocina</b><span>Alt+6</span></button>
+            <button class="sound" style="--pt:#4dd4ff"><b>Teclas</b><span>Alt+7</span></button>
+            <button class="sound" style="--pt:#ff6b5b"><b>Lluvia</b><span>Alt+8</span></button>
+          </div>
+          <form class="addrow" id="agregar">
+            <input id="nombre" type="text" placeholder="Agrega otro sonido: escribe su nombre" maxlength="24" autocomplete="off" aria-label="Nombre del sonido">
+            <button type="submit">Agregar</button>
+          </form>
+        </div>
+      </div>
+      <span class="pin" style="top:0;left:0">Sin límite de espacios</span>
+      <span class="pin cy" style="top:0;right:0">Atajo por sonido</span>
+      <span class="pin" style="bottom:0;left:0">Color por sonido</span>
+    </div>
+    <div class="copy slide-r">
+      <div class="step">Sonidos</div>
+      <h2>Ocho no alcanzan.</h2>
+      <p>El soundboard de Discord te da ocho espacios. Vocyra usa una carpeta: caben los sonidos que quepan en tu disco, con su color, su atajo y sus categorías.</p>
+      <p class="sub">Pruébalo aquí mismo: escribe un nombre en el panel y mira que la rejilla no se acaba.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE 2 · VOZ -->
+<section class="showcase rev" id="voz">
+  <div class="wrap">
+    <div class="illus slide-r">
+      <div class="panel cy" data-ui>
+        <div class="p-bar"><b>Voces</b><span>Efectos en vivo</span></div>
+        <div class="p-row"><span>Grave</span><span class="k" style="margin-left:auto">Ctrl+F1</span></div>
+        <div class="p-row"><span>Radio vieja</span><span class="k" style="margin-left:auto">Ctrl+F2 · mantener</span></div>
+        <div class="p-row"><span>Agudo</span><span class="k" style="margin-left:auto">Ctrl+F3</span></div>
+        <div class="p-row"><span>Robot</span><span class="k" style="margin-left:auto">Ctrl+F4</span></div>
+        <div class="p-body">
+          <span class="p-label">Compuerta de ruido</span>
+          <div class="p-sel">Umbral −42 dB · cierra en 180 ms</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+            <span style="font-size:12.5px;color:var(--ok)">Voz detectada</span>
+            <div class="meter" aria-hidden="true" style="margin-left:auto">
+              <i style="height:55%"></i><i style="height:85%"></i><i style="height:100%"></i><i style="height:62%"></i><i style="height:40%"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin cy" style="top:0;right:0">Sobre tu micrófono real</span>
+      <span class="pin" style="bottom:0;left:0">Corta el ventilador</span>
+    </div>
+    <div class="copy slide-l">
+      <div class="step cy">Voz</div>
+      <h2>Cambia tu voz sin cambiar de app.</h2>
+      <p>Grave, agudo o radio vieja, aplicado en vivo sobre tu micrófono real. Cada efecto puede tener su propio atajo, y la compuerta de ruido silencia el ventilador y el teclado cuando no hablas.</p>
+      <p class="sub">También lee en voz alta lo que tengas copiado, por si prefieres escribir que hablar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE 3 · CONTROL -->
+<section class="showcase">
+  <div class="wrap">
+    <div class="illus slide-l">
+      <div class="panel" data-ui>
+        <div class="p-bar"><b>Control desde el celular</b><span>Red local</span></div>
+        <div class="qr-zone">
+          <span class="p-label" style="text-align:center">Escanea el código con tu teléfono</span>
+          <!-- El QR que genera la app: la dirección de tu red local con su token de un solo uso -->
+          <div class="qr">
+            <svg viewBox="0 0 41 41" shape-rendering="crispEdges" role="img" aria-label="Código QR con la dirección local que abre el control desde el teléfono">
+              <path fill="#ffffff" d="M0 0h41v41H0z"/>
+              <path stroke="#000000" d="M4 4.5h7m2 0h1m3 0h1m1 0h4m7 0h7M4 5.5h1m5 0h1m3 0h2m1 0h2m2 0h1m2 0h5m1 0h1m5 0h1M4 6.5h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h1m1 0h2m1 0h1m2 0h1m2 0h1m1 0h3m1 0h1M4 7.5h1m1 0h3m1 0h1m1 0h1m5 0h1m1 0h1m2 0h6m1 0h1m1 0h3m1 0h1M4 8.5h1m1 0h3m1 0h1m1 0h1m2 0h3m1 0h1m2 0h1m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1M4 9.5h1m5 0h1m1 0h1m1 0h1m1 0h6m2 0h1m1 0h2m2 0h1m5 0h1M4 10.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M12 11.5h1m1 0h1m4 0h1m1 0h2m3 0h1m1 0h1M4 12.5h1m1 0h5m5 0h1m1 0h3m4 0h4m1 0h5M4 13.5h1m1 0h3m2 0h1m1 0h2m1 0h1m1 0h3m1 0h2m2 0h2m1 0h2m1 0h3M5 14.5h1m2 0h1m1 0h3m2 0h1m6 0h2m1 0h2m2 0h2m1 0h1m1 0h2M8 15.5h1m2 0h3m2 0h1m1 0h3m4 0h1m2 0h1m4 0h3M6 16.5h1m1 0h1m1 0h1m2 0h4m5 0h1m2 0h2m3 0h2m1 0h1m2 0h1M4 17.5h1m3 0h2m5 0h1m1 0h5m2 0h1m1 0h1m4 0h1m1 0h1m1 0h2M4 18.5h1m3 0h3m3 0h1m2 0h2m2 0h1m1 0h1m1 0h1m2 0h1m4 0h3M4 19.5h3m2 0h1m3 0h2m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3m1 0h1M5 20.5h2m1 0h1m1 0h1m1 0h1m2 0h2m1 0h1m4 0h1m1 0h3m3 0h4m1 0h1M4 21.5h1m1 0h1m1 0h1m3 0h4m2 0h2m1 0h1m2 0h1m3 0h1m3 0h4M4 22.5h1m3 0h3m1 0h1m1 0h2m1 0h2m1 0h2m2 0h2m1 0h1m1 0h2m1 0h1m1 0h2M4 23.5h6m2 0h1m1 0h1m1 0h4m1 0h2m1 0h1m3 0h2m3 0h2M4 24.5h1m5 0h1m4 0h1m2 0h1m1 0h1m2 0h1m1 0h2m3 0h1m2 0h1m1 0h2M4 25.5h1m2 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h2m2 0h1m2 0h1m2 0h1m4 0h1M4 26.5h1m2 0h1m1 0h3m4 0h2m1 0h2m4 0h1m2 0h2m1 0h2m1 0h2M4 27.5h1m1 0h1m1 0h2m2 0h2m1 0h1m3 0h1m5 0h2m3 0h1m1 0h1M4 28.5h1m1 0h1m1 0h1m1 0h2m2 0h2m2 0h3m1 0h1m3 0h7m1 0h2M12 29.5h3m2 0h1m1 0h2m1 0h2m3 0h2m3 0h1m1 0h1M4 30.5h7m2 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m1 0h2M4 31.5h1m5 0h1m1 0h3m2 0h1m1 0h2m2 0h1m1 0h1m2 0h1m3 0h1m1 0h1M4 32.5h1m1 0h3m1 0h1m1 0h4m1 0h1m4 0h2m1 0h8m3 0h1M4 33.5h1m1 0h3m1 0h1m1 0h3m1 0h6m2 0h2m1 0h1m1 0h1m2 0h2M4 34.5h1m1 0h3m1 0h1m1 0h1m4 0h1m3 0h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1M4 35.5h1m5 0h1m2 0h1m1 0h1m1 0h1m2 0h1m3 0h1m3 0h4m2 0h1M4 36.5h7m1 0h1m1 0h4m5 0h2m2 0h3m1 0h1m2 0h2"/>
+            </svg>
+          </div>
+          <span class="qr-nota">http://192.168.1.50:47820 · tu red, con un token de un solo uso</span>
+        </div>
+        <div class="p-row"><span>Teléfono conectado</span><span class="r">Android · Chrome</span></div>
+        <div class="p-row"><span>Tambores</span><span class="r">disparado hace 2 s</span></div>
+        <div class="p-row"><span>Risa</span><span class="r">disparado hace 14 s</span></div>
+      </div>
+      <span class="pin" style="top:0;right:0">No sale a internet</span>
+      <span class="pin cy" style="bottom:0;left:0">Sin soltar el mouse</span>
+    </div>
+    <div class="copy slide-r">
+      <div class="step">Control</div>
+      <h2>Dispáralos desde el teléfono.</h2>
+      <p>Vocyra abre un control en tu red local y te da un código QR. Desde el teléfono sueltas sonidos sin salir del juego ni buscar la ventana.</p>
+      <p class="sub">Y si prefieres el teclado, los atajos se registran en Windows: funcionan en pantalla completa, sin alt-tab.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="section has-glow" id="como">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Cómo funciona</span>
+      <h2>Tu voz y tus sonidos salen por el mismo micrófono</h2>
+      <p>Vocyra se mete entre tu micrófono y Discord. Para Discord es un micrófono más, así que no hay nada que configurar del otro lado.</p>
+    </div>
+    <div class="chain reveal">
+      <div class="step-card">
+        <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 18v3"/></svg></div>
+        <h3>Tu micrófono</h3>
+        <p>Eliges tu micrófono real en Ajustes. Tu voz entra tal como la grabas.</p>
+      </div>
+      <div class="step-card">
+        <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h2l2-6 3 14 3-11 2 5h4"/></svg></div>
+        <h3>Vocyra mezcla</h3>
+        <p>Suma los sonidos, aplica el efecto de voz y corta el ruido de fondo.</p>
+      </div>
+      <div class="step-card">
+        <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 7v4a7 7 0 0014 0V7"/><path d="M5 7a2 2 0 110-4 2 2 0 010 4zM19 7a2 2 0 110-4 2 2 0 010 4zM12 18v3"/></svg></div>
+        <h3>Un canal virtual</h3>
+        <p>Todo viaja junto por VB-Cable, un canal de audio gratuito que Vocyra puede instalar por ti.</p>
+      </div>
+      <div class="step-card">
+        <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18V8a2 2 0 012-2h12a2 2 0 012 2v10l-4-3H6a2 2 0 01-2-2z"/></svg></div>
+        <h3>Discord te oye</h3>
+        <p>Eliges «CABLE Output» como micrófono y listo. Tu voz y tus sonidos, juntos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MÁS QUE UN SOUNDBOARD -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow cyan">Todo en un .exe</span>
+      <h2>Mucho más que un soundboard</h2>
+      <p>Las cosas que normalmente pides prestadas a tres programas distintos, aquí vienen incluidas.</p>
+    </div>
+    <div class="cards reveal">
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        <h3>Sonidos ilimitados</h3>
+        <p>Es una carpeta, no una lista de espacios. Arrastra tus archivos y ya están.</p>
+      </div>
+      <div class="card cy">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></div>
+        <h3>Saca el audio de un video</h3>
+        <p>Suelta un MP4 y Vocyra extrae la pista. También graba lo que suena en tu PC.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></div>
+        <h3>Repetición instantánea</h3>
+        <p>Graba siempre los últimos segundos. Si alguien dice algo irrepetible, un atajo lo guarda.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M4 12h16M4 18h7"/></svg></div>
+        <h3>Recorte no destructivo</h3>
+        <p>Ajusta dónde empieza y dónde acaba cada sonido sin tocar el archivo original.</p>
+      </div>
+      <div class="card cy">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg></div>
+        <h3>Packs y respaldo</h3>
+        <p>Empaqueta sonidos en un archivo .vocyra para compartirlos, y respalda en tu propio Drive.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/></svg></div>
+        <h3>Se queda en la bandeja</h3>
+        <p>Arranca oculta y responde a los atajos sin robarte el foco mientras juegas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREGUNTAS -->
+<section class="section has-glow" id="preguntas" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Antes de bajarlo</span>
+      <h2>Preguntas frecuentes</h2>
+      <p>Si te falta algo por saber, escribe a <a href="mailto:vocyra.app@gmail.com" style="color:var(--accent)">vocyra.app@gmail.com</a> y te responde el equipo de Vocyra, no un formulario automático.</p>
+    </div>
+    <div class="faq reveal">
+      <details name="faq"><summary>¿Es gratis de verdad?<span class="pm" aria-hidden="true"></span></summary>
+        <p>Sí. Gratis, sin anuncios y sin cuenta. No hay versión de paga ni sonidos bloqueados.</p></details>
+      <details name="faq"><summary>¿Qué necesito aparte de Vocyra?<span class="pm" aria-hidden="true"></span></summary>
+        <p>VB-Cable, que también es gratis: es el cable virtual por donde salen tu voz y tus sonidos juntos. Vocyra puede descargarlo e instalarlo desde Ajustes, y verifica su firma antes de ejecutarlo.</p></details>
+      <details name="faq"><summary>¿Sirve fuera de Discord?<span class="pm" aria-hidden="true"></span></summary>
+        <p>Sí. Cualquier app que te pida micrófono funciona igual: juegos con chat de voz, Zoom, Teams, WhatsApp de escritorio, grabadores. Donde elijas «CABLE Output» como micrófono, ahí entra Vocyra.</p></details>
+      <details name="faq"><summary>¿Cuántos sonidos puedo tener?<span class="pm" aria-hidden="true"></span></summary>
+        <p>Los que quepan en tu disco. Los sonidos son archivos en una carpeta, así que no hay espacios ni tope; puedes agrupar por categorías y armar perfiles por juego.</p></details>
+      <details name="faq"><summary>¿Trae sonidos incluidos?<span class="pm" aria-hidden="true"></span></summary>
+        <p>No. Vocyra llega vacía a propósito: no reparte audio con derechos de autor. Puedes arrastrar los tuyos, sacar el audio de un video o grabar lo que suena en tu PC.</p></details>
+      <details name="faq"><summary>¿Se instala en mi sistema?<span class="pm" aria-hidden="true"></span></summary>
+        <p>No. Es un ZIP portable: lo descomprimes donde quieras y se abre desde ahí. Los ajustes viven en tu carpeta de usuario y los sonidos junto al programa.</p></details>
+      <details name="faq"><summary>¿De dónde sale el nombre?<span class="pm" aria-hidden="true"></span></summary>
+        <p>De <i>vox, vocis</i>, el latín de voz: la misma raíz que hay detrás de vocal, vocear y vocabulario. La terminación no significa nada por sí sola; es la que comparten las demás aplicaciones de la casa, para que se lean como una familia sin tener que explicarlo.</p></details>
+      <details name="faq"><summary>¿Me van a escuchar bien?<span class="pm" aria-hidden="true"></span></summary>
+        <p>Tu voz pasa completa y la compuerta de ruido limpia el fondo. Un detalle que sí importa: en Discord usa el perfil de voz «Estudio», porque el aislamiento de voz borra todo lo que no sea tu boca, y con él se pierden los sonidos.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Dos minutos y estás sonando</h2>
+    <p>El botón descarga un ZIP. Lo descomprimes, abres «Abrir Vocyra (primera vez).bat» y eliges tu micrófono; Vocyra se encarga del cable.</p>
+    <div class="hero-cta" style="margin-bottom:26px">
+      <a class="btn btn-primary" href="https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg>
+        Descargar gratis
+      </a>
+    </div>
+    <div class="badges">
+      <span class="badge"><span class="dot"></span>Windows 10 / 11 (64-bit)</span>
+      <span class="badge">Portable · sin instalación</span>
+    </div>
+  </div>
+</section>
+
+<!-- MÁS APLICACIONES -->
+<section class="section otras" id="apps" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow cyan">Más aplicaciones</span>
+      <h2>Otras cosas que estoy construyendo</h2>
+      <p>Todas con la misma idea: hacen una cosa, la hacen bien y no te piden cuenta. Las cuatro viven en <a href="https://br105.github.io/" style="color:var(--accent)">Gecko Apps</a>.</p>
+    </div>
+    <div class="cards reveal">
+      <a class="card app" href="https://br105.github.io/Zynora-releases/">
+        <img class="app-ico" src="assets/zynora-icono.png" alt="">
+        <h3>Zynora</h3>
+        <p>Remapeo, macros, RGB y ecualizador para mouse, teclado y control de cualquier marca. Un solo .exe para Windows.</p>
+        <span class="app-cta">Ver la página
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+      <div class="card app">
+        <img class="app-ico" src="assets/opsira-icono.png" alt="">
+        <h3>Opsira</h3>
+        <p>Editor de foto y video para Android: filtros, recorte, quitar el fondo, collage y texto, sin marca de agua.</p>
+        <span class="app-cta pronto">Próximamente</span>
+      </div>
+      <div class="card app">
+        <img class="app-ico" src="assets/ordira-icono.png" alt="">
+        <h3>Ordira</h3>
+        <p>Acomoda tus fotos en cuadrícula y mira cómo va a quedar tu perfil antes de publicar nada.</p>
+        <span class="app-cta pronto">Próximamente</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-brand">
+        <span class="lockup"><img src="vocyra.png" alt=""><span class="word"><span class="v">V</span>ocyra</span></span>
+        <p>Soundboard y cambiador de voz para Windows. Sonidos ilimitados, efectos en vivo y atajos globales, en un solo archivo portable.</p>
+        <a class="foot-credit" href="https://www.youtube.com/@Azmo105" target="_blank" rel="noopener">
+          <img src="assets/azmo105-logo.png" alt="AZMO105" width="30" height="30" loading="lazy">
+          Hecho por AZMO105
+        </a>
+        <p class="foot-made"><b>Idea y dirección de AZMO105</b> · desarrollado con Claude (Anthropic).</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Producto</h4>
+          <a href="#sonidos">Sonidos</a>
+          <a href="#voz">Voz</a>
+          <a href="#como">Cómo funciona</a>
+          <a href="https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip">Descargar</a>
+        </div>
+        <div class="foot-col">
+          <h4>Recursos</h4>
+          <a href="https://github.com/BR105/Vocyra-releases">GitHub</a>
+          <a href="#preguntas">Preguntas frecuentes</a>
+          <a href="privacidad.html">Política de privacidad</a>
+          <a href="terminos.html">Condiciones del servicio</a>
+        </div>
+        <div class="foot-col">
+          <h4>Apóyanos</h4>
+          <a class="kofi" href="https://ko-fi.com/azmo105" target="_blank" rel="noopener">Apóyanos con un café</a>
+          <a href="mailto:vocyra.app@gmail.com">vocyra.app@gmail.com</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Vocyra. Proyecto independiente. No afiliado ni asociado a ninguna marca.</span>
+      <span><a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Condiciones</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.remove('no-js');
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Revelados al entrar en pantalla (mismo patrón que Zynora) */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { rootMargin:'0px 0px -12% 0px' });
+  document.querySelectorAll('.slide-l,.slide-r,.reveal').forEach(function(el){ io.observe(el); });
+
+  /* Lo vivo: la rejilla que no se acaba */
+  var colores = ['#ff8a3d','#5b8cff','#3ddc97','#f25f8b','#ffc94d','#9b7bff','#4dd4ff','#ff6b5b'];
+  var rejilla = document.getElementById('rejilla');
+  var form = document.getElementById('agregar');
+  var campo = document.getElementById('nombre');
+  var cuenta = document.getElementById('cuenta');
+  var cabe = document.getElementById('cabe');
+
+  function pinta(){
+    var n = rejilla.children.length;
+    cuenta.textContent = n + ' sonidos';
+    cabe.textContent = 'y aquí van ' + n;
+  }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var nombre = campo.value.trim();
+    if(!nombre){ campo.focus(); return; }
+    var n = rejilla.children.length;
+    var b = document.createElement('button');
+    b.className = 'sound';
+    b.type = 'button';
+    b.style.setProperty('--pt', colores[n % 8]);
+    b.innerHTML = '<b></b><span>Shift+' + ((n % 9) + 1) + '</span>';
+    b.querySelector('b').textContent = nombre;
+    rejilla.appendChild(b);
+    campo.value = '';
+    pinta();
+    b.scrollIntoView({ block:'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    if(!reduce){ b.animate([{transform:'scale(.82)',opacity:0},{transform:'none',opacity:1}], {duration:260, easing:'cubic-bezier(.16,1,.3,1)'}); }
+  });
+  rejilla.addEventListener('click', function(e){
+    var t = e.target.closest('.sound'); if(!t) return;
+    rejilla.querySelectorAll('.on').forEach(function(x){ x.classList.remove('on'); });
+    t.classList.add('on');
+    setTimeout(function(){ t.classList.remove('on'); }, 850);
+  });
+  pinta();
+
+  /* Los medidores laten */
+  if(!reduce){
+    document.querySelectorAll('.meter').forEach(function(m, mi){
+      Array.prototype.forEach.call(m.children, function(bar, i){
+        var h = parseFloat(bar.style.height) || 60;
+        bar.animate([{height:h+'%'},{height:Math.max(14,h*.45)+'%'},{height:h+'%'}],
+          {duration:900+(i%5)*170, iterations:Infinity, delay:(mi*60)+i*70, easing:'ease-in-out'});
+      });
+    });
+  }
+})();
+</script>
 </body>
 </html>

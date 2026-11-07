@@ -3,3 +3,8 @@
 *.exe
 *.zip
 *.cer
+
+# Capturas y medidas de la skill de diseño (trabajo local, no va al sitio)
+.taste-skill/
+# Maquetas descartadas de la página, se quedan en local
+propuestas.html
