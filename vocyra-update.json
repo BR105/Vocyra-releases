@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.15",
-    "date":  "2026-11-09",
-    "notes":  "Voz IA para todos (experimental, solo con tarjeta NVIDIA): en Voz IA pulsa «Descargar voz IA» y Vocyra baja lo necesario (~6 GB, una sola vez). Entrena la voz de una persona con sus audios (si te dio permiso) y úsala en vivo en Discord. Entrenar ahora es más rápido y se ajusta a tu tarjeta. «Sugerir tono» es más estable. Desde el celular ya puedes prender y apagar la voz IA.",
-    "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
+    "version": "0.1.15",
+    "date": "2026-11-09",
+    "notes": "Voz IA para todos (experimental, solo con tarjeta NVIDIA): en Voz IA pulsa «Descargar voz IA» y Vocyra baja lo necesario (~6 GB, una sola vez). Entrena la voz de una persona con sus audios (si te dio permiso) y úsala en vivo en Discord. Entrenar ahora es más rápido y se ajusta a tu tarjeta. «Sugerir tono» es más estable. Desde el celular ya puedes prender y apagar la voz IA.",
+    "url": "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
