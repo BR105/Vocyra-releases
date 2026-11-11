@@ -2,6 +2,8 @@
 
 Soundboard gratuito para Windows: reproduce sonidos ilimitados en Discord, juegos y llamadas, con atajos de teclado globales.
 
+**Página oficial:** https://br105.github.io/Vocyra-releases/
+
 ## Descarga
 
 Descarga **[Vocyra-portable.zip](https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip)**, descomprímelo y la primera vez abre «Abrir Vocyra (primera vez).bat».
