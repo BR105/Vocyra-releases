@@ -1,0 +1,14 @@
+{
+  "_formato": {
+    "_": "Lista curada a mano por el dueño. Nada se publica solo. Un pack se agrega aquí solo después de revisarlo.",
+    "_regla": "SOLO packs de sonidos. NUNCA packs con voces IA: publicar una voz entrenada de una persona real facilita la suplantación (ver terminos.html).",
+    "nombre": "texto corto, obligatorio",
+    "descripcion": "una o dos líneas, obligatorio",
+    "autor": "quién lo armó, opcional",
+    "sonidos": "número de sonidos, opcional",
+    "categoria": "memes | juegos | música | voces de personaje | otro, opcional",
+    "drive": "el id de Google Drive del pack, obligatorio (lo que va después del # en el enlace de Compartir)",
+    "fecha": "AAAA-MM-DD en que se agregó, opcional"
+  },
+  "packs": []
+}
