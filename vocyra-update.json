@@ -1,6 +1,6 @@
 {
-    "version": "0.1.15",
-    "date": "2026-11-09",
-    "notes": "Voz IA para todos (experimental, solo con tarjeta NVIDIA): en Voz IA pulsa «Descargar voz IA» y Vocyra baja lo necesario (~6 GB, una sola vez). Entrena la voz de una persona con sus audios (si te dio permiso) y úsala en vivo en Discord. Entrenar ahora es más rápido y se ajusta a tu tarjeta. «Sugerir tono» es más estable. Desde el celular ya puedes prender y apagar la voz IA.",
-    "url": "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
+    "version":  "0.1.16",
+    "date":  "2026-11-12",
+    "notes":  "Novedades: traducción de voz en vivo (español a inglés) y modo de palabras invertidas; búsqueda de sonidos en línea (Freesound); Stream Deck, OBS y chat de Twitch (Ajustes › Para streamers); envío de clips a Discord; bajar el volumen de otras apps mientras suena un sonido; exportar clips a MP3; voces IA dentro de un pack y nuevo efecto «Al revés». Mejoras: Voces en pestañas, la voz IA ya no corta palabras ni produce chasquidos y libera la tarjeta de video tras 10 minutos sin uso, avance visible y confirmación antes de cualquier descarga.",
+    "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
