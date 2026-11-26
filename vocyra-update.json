@@ -1,6 +1,6 @@
 {
-    "version":  "0.1.17",
-    "date":  "2026-11-17",
-    "notes":  "Novedades de Vocyra 0.1.17\n\nTraductor de voz\n- Nuevos idiomas: del inglés al español y del español al francés, alemán e italiano.\n- Antes de descargar algo, Vocyra indica qué es, cuánto pesa y de dónde viene.\n- Usa la voz de Windows de cada idioma (también las del Narrador) y avisa si falta alguna.\n- Atajo para encender o apagar la traducción, incluso con la ventana oculta.\n\nVoces y sonidos\n- Nueva voz «Mala señal»: tu voz se corta y se traba como con mala conexión.\n- Ventana mini sin bordes: muévela, cambia su tamaño y su transparencia. Recuerda dónde la dejaste.\n- Los favoritos y los sonidos con atajo suenan al instante.\n- El micrófono se libera mientras estás en silencio, y Windows deja de marcarlo en uso.\n- Aviso si eliges «CABLE Output» como micrófono.\n\nGeneral\n- Mejoras de interfaz y de rendimiento.\n- Vocyra necesita conectarse a internet al menos una vez cada 7 días.\n",
+    "version":  "0.1.18",
+    "date":  "2026-11-26",
+    "notes":  "Limitador en el audio que va a Discord: varios sonidos a la vez ya no saturan. Deshacer al quitar un sonido. Modo No molestar para streamers. Palabras que tocan sonidos al decirlas. Mini tablero más pulido (esquinas, transparencia y cerrar). Compartir en vivo el audio de una app (Spotify, navegador, juego) con Discord. Consejo para usar el perfil «Estudio» de Discord y que tus sonidos se oigan bien.",
     "url":  "https://github.com/BR105/Vocyra-releases/releases/latest/download/Vocyra-portable.zip"
 }
